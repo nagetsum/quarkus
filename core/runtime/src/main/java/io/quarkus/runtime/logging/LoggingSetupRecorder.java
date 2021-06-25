@@ -94,7 +94,13 @@ public class LoggingSetupRecorder {
         final LogContext logContext = LogContext.getLogContext();
         final Logger rootLogger = logContext.getLogger("");
 
-        rootLogger.setLevel(config.level);
+        if (config.level.intValue() < buildConfig.minLevel.intValue()) {
+            rootLogger.setLevel(buildConfig.minLevel);
+            log.warnf("Log level %s for root logger set below minimum logging level %s, promoting it to %s",
+              config.level, buildConfig.minLevel, buildConfig.minLevel);
+        } else {
+            rootLogger.setLevel(config.level);
+        }
 
         ErrorManager errorManager = new OnlyOnceErrorManager();
         final Map<String, CleanupFilterConfig> filters = config.filters;
